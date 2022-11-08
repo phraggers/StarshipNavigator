@@ -1,0 +1,18 @@
+SDL_Rect* cascadia = (SDL_Rect*)State_Alloc(sizeof(SDL_Rect)*127, 0);
+	{
+		SDL_Rect* r = cascadia;
+		for (int i = ' '; i < 0x7f; i++) { r[i].w = 89; r[i].h = 178; }
+		for (int i = ' '; i < '4'; i++) { r[i].y = 0; }
+		for (int i = '4'; i < 'H'; i++) { r[i].y = 178; }
+		for (int i = 'H'; i < '\\'; i++) { r[i].y = 356; }
+		for (int i = '\\'; i < 'p'; i++) { r[i].y = 534; }
+		for (int i = 'p'; i < 0x7f; i++) { r[i].y = 712; }
+		for (int i = 0x20; i < 0x7f; i++) { int mod = (i - 0x20) % 20; r[i].x = 5 + (95 * mod); }
+
+		SDL_RWops* ofile = SDL_RWFromFile("CascadiaBold.atlas", "wb");
+		if (ofile)
+		{
+			SDL_RWwrite(ofile, cascadia, 1, sizeof(SDL_Rect) * 127);
+			ofile->close(ofile);
+		}
+	}
