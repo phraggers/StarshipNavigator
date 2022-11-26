@@ -1,43 +1,31 @@
 
-#ifndef _SN_TIMER_H_
-#define _SN_TIMER_H_
+#ifndef TIMER_H_
+#define TIMER_H_
 
-typedef struct
+struct FrameTimer
 {
-    u64 Timers[DEF_TIMER_SLOTS]; // timer slots
-    u64 PerfFreq;
-    int TargetFPS;
+	int target_fps;
+	u64 perf_freq;
+	u64 start;
+	u64 end;
+	r64 prev_time;
+	r64 target_time;
+	u64 total_frames;
+	r32 avg_fps;
 
-    struct
-    {
-        u64 Start;
-        u64 End;
-        r64 PreviousTime;
-        r64 TargetTime;
-    } Frame;
+	FrameTimer(void);
+	void Init(int _fps);
+	void FrameStart(void);
+	void FrameEnd(void);
+};
 
-    struct
-    {
-        u64 Frames; // total frames since init
-        r32 AvgFPS;
-    } Total;
+struct Timer
+{
+	u64 perf_freq;
+	u64 timer;
 
-    struct
-    {
-        u8 Frames;
-        u32 Ticks;
-        r32 AvgFPS;
-    } Sample; // over last second
-} SN_Timer;
+	Timer(void);
+	r64 Delta(void);
+};
 
-bool Timer_IsTimerInit(void);
-void Timer_Init(int _TargetFPS);
-inline r64 Timer_GetPerfElapsed(u64 _Previous);
-inline r64 Timer_GetPerfInterval(u64 _Start, u64 _End);
-void Timer_FrameStart(void);
-void Timer_FrameEnd(void);
-int Timer_Add(void); // returns timer ID
-r64 Timer_Delta(int _ID);
-r64 Timer_End(int _ID);
-
-#endif //_SN_TIMER_H_
+#endif // TIMER_H_

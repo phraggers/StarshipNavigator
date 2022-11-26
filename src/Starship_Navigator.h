@@ -1,5 +1,5 @@
-#ifndef _STARSHIPNAVIGATOR_H_
-#define _STARSHIPNAVIGATOR_H_
+#ifndef _STARSHIP_NAVIGATOR_H_
+#define _STARSHIP_NAVIGATOR_H_
 
 #if !(defined _MSC_VER)
 #define _MSC_VER 0
@@ -69,70 +69,26 @@ typedef   enum { false = 0, true = 1 }   bool;
 #define TB(Value) (GB(Value)*1024LL)
 
 //-=-=-=-=-=-=-=-=-=-=//
-//   DEFAULT PREFS    //
-//-=-=-=-=-=-=-=-=-=-=//
-// system
-#define DEF_APPORG "Phragware"
-#define DEF_APPNAME "StarshipNavigator"
-#define DEF_APPVER_MAJ 0
-#define DEF_APPVER_MIN 1
-#define DEF_APPVER_PAT 0
-#define DEF_MULTITHREAD 1
-
-// audio
-#define DEF_AUDIO_FREQ 48000
-#define DEF_AUDIO_FORMAT MIX_DEFAULT_FORMAT
-#define DEF_AUDIO_CHANNELS 2
-#define DEF_AUDIO_CHUNKSIZE 1024
-
-// window
-#define DEF_WINDOW_WIDTH 960
-#define DEF_WINDOW_HEIGHT 540
-
-// state
-#define DEF_ALLOCSIZE MB(256)
-
-// logging
-#define DEF_LOG_BUFFER_SIZE 256
-#define DEF_LOG_QUEUE_COUNT 24
-
-// input
-#define DEF_INPUT_KEYCOUNT 16
-#define DEF_INPUT_DEADZONE 3200
-#define DEF_INPUT_CONTROLLERS 4
-
-// timer
-#define DEF_TIMER_SLOTS 32
-
-u64 SN_TopOfTheStack;
-u64 SN_GetCurrentStackSize(void);
-
-//-=-=-=-=-=-=-=-=-=-=//
 //      INCLUDES      //
 //-=-=-=-=-=-=-=-=-=-=//
+
 #define _CRT_SECURE_NO_WARNINGS 1
+
 #include <curl/curl.h>
+#include <physfs.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_net.h>
-#include "StringUtils.h"
+#include <SDL2/SDL_ttf.h>
+
+#include <string>
+#include <vector>
+#include <map>
+
 #include "Timer.h"
-#include "Window.h"
-//#include "Audio.h"
+#include "Video.h"
 #include "Input.h"
-#include "Random.h"
-#include "Log.h"
-#include "State.h"
+#include "Application.h"
 
-#ifdef SN_MAIN
-#define STB_IMAGE_IMPLEMENTATION
-SN_AppState* State;
-#else
-extern SN_AppState* State;
-#endif
-#define STBI_MALLOC(sz)           SDL_malloc(sz)
-#define STBI_REALLOC(p,newsz)     SDL_realloc(p,newsz)
-#define STBI_FREE(p)              SDL_free(p)
-#include <stb_image.h>
-
-#endif //_STARSHIPNAVIGATOR_H_
+#endif //_STARSHIP_NAVIGATOR_H_

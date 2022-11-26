@@ -1,98 +1,103 @@
-#ifndef _SN_INPUT_H_
-#define _SN_INPUT_H_
 
-typedef struct
+#ifndef INPUT_H_
+#define INPUT_H_
+
+struct KeyState
 {
-	SDL_Keycode Key;
-	bool IsDown;
-	bool WasDown;
-	bool TextDown;
-} SN_KeyState;
+	bool is_down;
+	bool was_down;
+	bool text_down;
+};
 
-typedef struct
+struct ButtonState
 {
-	bool IsDown;
-	bool WasDown;
-} SN_BtnState;
+	bool is_down;
+	bool was_down;
+};
 
-typedef enum
+enum MOUSEWHEEL
 {
 	MW_NONE,
 	MW_UP,
 	MW_DOWN,
 	MW_LEFT,
 	MW_RIGHT
-} SN_MOUSEWHEEL;
+};
 
-typedef struct
+struct Mouse //TODO: separate mouse state by window and global (desktop pos vs window pos)
 {
-	int X;
-	int Y;
-	SN_BtnState Left; // SDL_BUTTON_LEFT
-	SN_BtnState Right; // SDL_BUTTON_RIGHT
-	SN_BtnState Middle; // SDL_BUTTON_MIDDLE
-	SN_BtnState X1; // SDL_BUTTON_X1
-	SN_BtnState X2; // SDL_BUTTON_X2
-	SN_MOUSEWHEEL MouseWheel; // enum SN_MOUSEWHEEL
-} SN_Mouse;
+	int x;
+	int y;
+	ButtonState left; // SDL_BUTTON_LEFT
+	ButtonState right; // SDL_BUTTON_RIGHT
+	ButtonState middle; // SDL_BUTTON_MIDDLE
+	ButtonState x1; // SDL_BUTTON_X1
+	ButtonState x2; // SDL_BUTTON_X2
+	MOUSEWHEEL wheel; // enum MOUSEWHEEL
+};
 
-typedef struct
+struct Controller
 {
-	SDL_GameController* Controller;
-	SDL_JoystickID ID;
-	bool Connected;
-	SN_BtnState A;
-	SN_BtnState B;
-	SN_BtnState X;
-	SN_BtnState Y;
-	SN_BtnState Back;
-	SN_BtnState Guide;
-	SN_BtnState Start;
-	SN_BtnState LeftStick;
-	SN_BtnState RightStick;
-	SN_BtnState LeftShoulder;
-	SN_BtnState RightShoulder;
-	SN_BtnState DPadUp;
-	SN_BtnState DPadDown;
-	SN_BtnState DPadLeft;
-	SN_BtnState DPadRight;
-	SN_BtnState Misc1;
-	SN_BtnState Paddle1;
-	SN_BtnState Paddle2;
-	SN_BtnState Paddle3;
-	SN_BtnState Paddle4;
-	SN_BtnState TouchPad;
-	i16 LeftX;
-	i16 LeftY;
-	i16 RightX;
-	i16 RightY;
-	i16 LeftTrigger;
-	i16 RightTrigger;
-} SN_Controller;
+	SDL_GameController* handle;
+	SDL_JoystickID id;
+	bool connected;
+	ButtonState a;
+	ButtonState b;
+	ButtonState x;
+	ButtonState y;
+	ButtonState back;
+	ButtonState guide;
+	ButtonState start;
+	ButtonState left_stick;
+	ButtonState right_stick;
+	ButtonState left_shoulder;
+	ButtonState right_shoulder;
+	ButtonState dpad_up;
+	ButtonState dpad_down;
+	ButtonState dpad_left;
+	ButtonState dpad_right;
+	ButtonState misc1;
+	ButtonState paddle1;
+	ButtonState paddle2;
+	ButtonState paddle3;
+	ButtonState paddle4;
+	ButtonState touchpad;
+	i16 left_x;
+	i16 left_y;
+	i16 right_x;
+	i16 right_y;
+	i16 left_trigger;
+	i16 right_trigger;
+};
 
-typedef struct
+struct Input
 {
-	SN_KeyState Keys[DEF_INPUT_KEYCOUNT];
-	SN_Mouse Mouse;
-	SN_Controller Controllers[DEF_INPUT_CONTROLLERS];
-} SN_Input;
+	bool* running;
+	Video* video;
+	std::map<SDL_Keycode, KeyState> keys;
+	Mouse mouse;
+	std::map<int, Controller> controllers;
+	i16 controller_deadzone;
 
-void Input_HandleEvents(void);
+	Input();
+	void Init(bool* _running, Video* _video);
+	void HandleEvents(void);
 
-bool Input_KeySingle(SDL_Keycode _Key);
-bool Input_KeyDown(SDL_Keycode _Key);
-bool Input_KeyRepeat(SDL_Keycode _Key);
-bool Input_KeyUp(SDL_Keycode _Key);
+	bool KeySingle(SDL_Keycode _key);
+	bool KeyDown(SDL_Keycode _key);
+	bool KeyRepeat(SDL_Keycode _key);
+	bool KeyUp(SDL_Keycode _key);
 
-bool Input_MouseSingle(Uint8 _Button);
-bool Input_MouseDown(Uint8 _Button);
-bool Input_MouseUp(Uint8 _Button);
-bool Input_MouseWheel(SN_MOUSEWHEEL _Direction);
+	bool MouseSingle(Uint8 _button);
+	bool MouseDown(Uint8 _button);
+	bool MouseUp(Uint8 _button);
+	bool MouseWheel(MOUSEWHEEL _direction);
 
-bool Input_ControllerBtnSingle(int _Controller, SDL_GameControllerButton _Button);
-bool Input_ControllerBtnDown(int _Controller, SDL_GameControllerButton _Button);
-bool Input_ControllerBtnUp(int _Controller, SDL_GameControllerButton _Button);
-i16 Input_ControllerAxisRaw(int _Controller, SDL_GameControllerAxis _Axis);
-i16 Input_ControllerAxisDZ(int _Controller, SDL_GameControllerAxis _Axis);
+	bool ControllerBtnSingle(int _controller, SDL_GameControllerButton _button);
+	bool ControllerBtnDown(int _controller, SDL_GameControllerButton _button);
+	bool ControllerBtnUp(int _controller, SDL_GameControllerButton _button);
+	i16 ControllerAxisRaw(int _controller, SDL_GameControllerAxis _axis);
+	i16 ControllerAxisDZ(int _controller, SDL_GameControllerAxis _axis);
+};
 
-#endif //_SN_INPUT_H_
+#endif // INPUT_H_

@@ -111,8 +111,8 @@ SDL_Cursor* Window_SDLCursor(void)
 	};
 
 	int i, row, col;
-	Uint8 data[4 * 32];
-	Uint8 mask[4 * 32];
+	Uint8 data[4 * 32] = { 0 };
+	Uint8 mask[4 * 32] = { 0 };
 	int hot_x, hot_y;
 
 	i = -1;
@@ -144,11 +144,16 @@ SDL_Cursor* Window_SDLCursor(void)
 			}
 		}
 	}
-	sscanf(cursor[row], "%d,%d", &hot_x, &hot_y);
-	SDL_Cursor* NewCursor = SDL_CreateCursor(data, mask, 32, 32, hot_x, hot_y);
-	SDL_ShowCursor(SDL_ENABLE);
-	SDL_SetCursor(NewCursor);
-	return NewCursor;
+
+	if (SDL_sscanf(cursor[row], "%d,%d", &hot_x, &hot_y) > 0)
+	{
+		SDL_Cursor* NewCursor = SDL_CreateCursor(data, mask, 32, 32, hot_x, hot_y);
+		SDL_ShowCursor(SDL_ENABLE);
+		SDL_SetCursor(NewCursor);
+		return NewCursor;
+	}
+	else
+		return 0;
 }
 
 static bool Window_SetIcon()

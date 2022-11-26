@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{57e94ad7-9933-4153-a55d-51ff621b550f}</ProjectGuid>
-    <RootNamespace>StarshipNavigator</RootNamespace>
+    <RootNamespace>Starship_Navigator</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -94,6 +94,15 @@
     <IncludePath>$(SolutionDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <ExternalIncludePath>$(SolutionDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnabled>false</VcpkgEnabled>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -135,13 +144,16 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2main.lib;SDL2.lib;SDL2_mixer.lib;SDL2_net.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;setupapi.lib;version.lib;imm32.lib;Ws2_32.lib;Iphlpapi.lib;freetype.lib;zlib.lib;brotlicommon-static.lib;brotlidec-static.lib;brotlienc-static.lib;bz2.lib;libpng16.lib;libcurl.lib;physfs-static.lib;SDL2main.lib;SDL2-static.lib;SDL2_image-static.lib;SDL2_mixer-static.lib;SDL2_net-static.lib;SDL2_ttf.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <StackReserveSize>1048576</StackReserveSize>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -153,6 +165,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -160,30 +173,24 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2main.lib;SDL2.lib;SDL2_mixer.lib;SDL2_net.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;setupapi.lib;version.lib;imm32.lib;Ws2_32.lib;Iphlpapi.lib;freetype.lib;zlib.lib;brotlicommon-static.lib;brotlidec-static.lib;brotlienc-static.lib;bz2.lib;libpng16.lib;libcurl.lib;physfs-static.lib;SDL2main.lib;SDL2-static.lib;SDL2_image-static.lib;SDL2_mixer-static.lib;SDL2_net-static.lib;SDL2_ttf.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <StackReserveSize>1048576</StackReserveSize>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Input.c" />
-    <ClCompile Include="src\Log.c" />
-    <ClCompile Include="src\Random.c" />
-    <ClCompile Include="src\StarshipNavigator.c" />
-    <ClCompile Include="src\State.c" />
-    <ClCompile Include="src\StringUtils.c" />
-    <ClCompile Include="src\Timer.c" />
-    <ClCompile Include="src\Window.c" />
+    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Input.cpp" />
+    <ClCompile Include="src\Starship_Navigator.cpp" />
+    <ClCompile Include="src\Timer.cpp" />
+    <ClCompile Include="src\Video.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Font.h" />
+    <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\Input.h" />
-    <ClInclude Include="src\Log.h" />
-    <ClInclude Include="src\Random.h" />
-    <ClInclude Include="src\StarshipNavigator.h" />
-    <ClInclude Include="src\State.h" />
-    <ClInclude Include="src\StringUtils.h" />
+    <ClInclude Include="src\Starship_Navigator.h" />
     <ClInclude Include="src\Timer.h" />
-    <ClInclude Include="src\Window.h" />
+    <ClInclude Include="src\Video.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

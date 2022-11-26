@@ -2,22 +2,11 @@
 #define SN_MAIN
 #include "StarshipNavigator.h"
 
-u64 SN_GetCurrentStackSize(void)
-{
-	int x = 0;
-	return SN_TopOfTheStack - (u64)&x;
-}
-
 static bool Main_Init(int _argc, char** _argv)
 {
 	State = (SN_AppState*)State_Init(0);
 
 	if (!State)
-	{
-		return 0;
-	}
-
-	if (!Log_Init())
 	{
 		return 0;
 	}
@@ -37,69 +26,49 @@ static bool Main_Init(int _argc, char** _argv)
 	State->ArgC = _argc;
 	State->ArgV = _argv;
 
-	SN_Log(LOGLEVEL_INFO, "MAIN: %s %d.%d.%d",
-			DEF_APPNAME, State->AppVersion.major, State->AppVersion.minor, State->AppVersion.patch);
-	SN_Log(LOGLEVEL_INFO, "MAIN: PrefPath: %s", State->PrefPath);
-	SN_Log(LOGLEVEL_INFO, "MAIN: BasePath: %s", State->BasePath);
-	Log_SetLogFilePath();
-
 	// SDL 2
 	{
 		if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 		{
-			SN_Log(LOGLEVEL_FATAL, "MAIN: Failed to start SDL2: %s", SDL_GetError());
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal Error: SDL_Init", SDL_GetError(), 0);
 			return 0;
 		}
 
 		SDL_VERSION(&State->SDLVersion);
-		SN_Log(LOGLEVEL_INFO, "MAIN: SDL %d.%d.%d", (int)State->SDLVersion.major,
-				(int)State->SDLVersion.minor, (int)State->SDLVersion.patch);
 	}
 
 	// SDL Mixer
 	{
 		if (!Mix_Init(MIX_INIT_OGG))
 		{
-			SN_Log(LOGLEVEL_FATAL, "MAIN: SDLMixer Init Error: %s", Mix_GetError());
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal Error: Mix_Init", Mix_GetError(), 0);
 			return 0;
 		}
 
 		MIX_VERSION(&State->MixVersion);
-		SN_Log(LOGLEVEL_INFO, "MAIN: SDLMixer %d.%d.%d", (int)State->MixVersion.major,
-				(int)State->MixVersion.minor, (int)State->MixVersion.patch);
 
 		if (Mix_OpenAudio(DEF_AUDIO_FREQ, DEF_AUDIO_FORMAT, DEF_AUDIO_CHANNELS, DEF_AUDIO_CHUNKSIZE) < 0)
 		{
-			SN_Log(LOGLEVEL_FATAL, "MAIN: Failed to open Audio Device: %s", Mix_GetError());
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal Error: Mix_OpenAudio", Mix_GetError(), 0);
 			return 0;
 		}
-
-		SN_Log(LOGLEVEL_INFO, "MAIN: AudioDevice Opened: Freq[%d] Format[%d] Channels[%d] Chunksize[%d]",
-				DEF_AUDIO_FREQ, DEF_AUDIO_FORMAT, DEF_AUDIO_CHANNELS, DEF_AUDIO_CHUNKSIZE);
 	}
 
 	// SDL Net
 	{
 		if (SDLNet_Init() < 0)
 		{
-			SN_Log(LOGLEVEL_FATAL, "MAIN: SDLNet Init Error: %s", SDLNet_GetError());
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal Error: SDLNet_Init", SDLNet_GetError(), 0);
 			return 0;
 		}
 
 		SDL_NET_VERSION(&State->NetVersion);
-		SN_Log(LOGLEVEL_INFO, "MAIN: SDLNet %d.%d.%d", (int)State->NetVersion.major,
-				(int)State->NetVersion.minor, (int)State->NetVersion.patch);
-
 	}
 
 	// SDL Config
 	if (SDL_JoystickEventState(SDL_ENABLE) != 1)
 	{
-		SN_Log(LOGLEVEL_ERROR, "MAIN: Failed to enable SDL_JoystickEventState: %s", SDL_GetError());
-	}
-	else
-	{
-		SN_Log(LOGLEVEL_DEBUG, "MAIN: JoystickEventState[%d]", SDL_JoystickEventState(SDL_QUERY));
+		SDL_Log("MAIN: Failed to enable SDL_JoystickEventState: %s", SDL_GetError());
 	}
 
 	// Window
@@ -108,58 +77,44 @@ static bool Main_Init(int _argc, char** _argv)
 
 	if (!Window_Init())
 	{
-		SN_Log(LOGLEVEL_FATAL, "MAIN: Failed to create Window!");
 		return 0;
 	}
 
 	State->Running = 1;
 
-	SN_Log(LOGLEVEL_INFO, "MAIN: Startup took %.02f ms", Timer_End(StartupTimer));
+	SDL_Log("MAIN: Startup took %.02f ms", Timer_End(StartupTimer));
 
 	return 1;
 }
 
 static void Main_Quit(void)
 {
-	SN_Log(LOGLEVEL_DEBUG, "MAIN: Stack Size: %u", SN_GetCurrentStackSize());
-
 	if (State->Window.Renderer)
 	{
 		SDL_DestroyRenderer(State->Window.Renderer);
 		State->Window.Renderer = 0;
-		SN_Log(LOGLEVEL_DEBUG, "MAIN: Renderer Destroyed");
 	}
 
 	if (State->Window.Handle)
 	{
 		SDL_DestroyWindow(State->Window.Handle);
 		State->Window.Handle = 0;
-		SN_Log(LOGLEVEL_DEBUG, "MAIN: Window Destroyed");
 	}
 
 	SDLNet_Quit();
-	SN_Log(LOGLEVEL_DEBUG, "MAIN: SDLNet Quit");
 	Mix_CloseAudio();
-	SN_Log(LOGLEVEL_INFO, "MAIN: Audio Device Closed");
 	Mix_Quit();
-	SN_Log(LOGLEVEL_DEBUG, "MAIN: SDLMixer Quit");
 
 	if ((SDL_WasInit(SDL_INIT_EVERYTHING)))
 	{
-		SN_Log(LOGLEVEL_INFO, "MAIN: SDL Quit");
 		SDL_Quit();
 	}
 
-	Log_Quit();
 	State_Quit();
 }
 
 int main(int argc, char** argv)
 {
-	{ int x = 0; SN_TopOfTheStack = (u64)&x; }
-	if (!Main_Init(argc, argv)) return 1;
-	SN_Log(LOGLEVEL_DEBUG, "MAIN: Stack Size: %u", SN_GetCurrentStackSize());
-
 	State->Running = 1;
 
 	SDL_Texture* bender_texture = 0;
@@ -212,7 +167,7 @@ int main(int argc, char** argv)
 			return -1;
 		}
 
-		benderrect = (SDL_Rect*)State_Alloc(sizeof(SDL_Rect) * 127, 0);
+		benderrect = (SDL_Rect*)State_malloc(sizeof(SDL_Rect) * 127);
 		if (benderrect)
 		{
 			SDL_RWops* benderfile = SDL_RWFromFile("BenderBold.atlas", "rb");
